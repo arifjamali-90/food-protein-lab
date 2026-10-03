@@ -1,0 +1,309 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Food Protein Structure Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Food Protein Structure Lab. Layout: a lab bench — the 3D model is the bench, missions are the protocol sheet beside it (stacks on phones) */
+:root{
+  --bg:#F4F7F3; --panel:#FFFFFF; --ink:#14221C; --muted:#5A6B63; --line:#D9E2DC;
+  --leaf:#0B6E4F; --leaf-soft:#E2F1EA; --papaya:#E9792F; --papaya-soft:#FCEBDD; --stage:#FFFFFF;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1613; --panel:#16201C; --ink:#E6EEE9; --muted:#9BB0A6; --line:#2A3832;
+  --leaf:#4FC39A; --leaf-soft:#173229; --papaya:#F39A5C; --papaya-soft:#3A2618; --stage:#0B110F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --panel:#16201C; --ink:#E6EEE9; --muted:#9BB0A6; --line:#2A3832;
+  --leaf:#4FC39A; --leaf-soft:#173229; --papaya:#F39A5C; --papaya-soft:#3A2618; --stage:#0B110F; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:14px;box-sizing:border-box}
+*{box-sizing:border-box}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:12px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 span{color:var(--papaya)}
+.sub{color:var(--muted);font-size:.92rem}
+.wrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:4/3;max-width:100%}
+#viewer{position:absolute;inset:0}
+.legend{position:absolute;left:10px;bottom:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px);pointer-events:none}
+.chip{font-size:.75rem;padding:3px 8px;border-radius:99px;background:var(--panel);border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+.chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.pick{position:absolute;right:10px;top:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.85rem;max-width:62%}
+.pick b{font-family:var(--f-mono)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+button{font:inherit;cursor:pointer}
+.tbtn{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:.85rem}
+.tbtn:hover{border-color:var(--leaf)}
+.tbtn[aria-pressed="true"]{background:var(--leaf);color:var(--panel);border-color:var(--leaf)}
+:focus-visible{outline:3px solid var(--papaya);outline-offset:2px}
+.missions{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mlist{display:flex;flex-wrap:wrap;gap:6px}
+.mbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:5px 11px;font-size:.82rem;display:inline-flex;gap:6px;align-items:center}
+.mbtn .n{font-family:var(--f-mono);color:var(--muted)}
+.mbtn[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mbtn[aria-current="true"] .n{color:var(--papaya)}
+.mbtn.done::after{content:"✓";color:var(--leaf);font-weight:700}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.eyebrow{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf);font-weight:600}
+.card h2{font-family:var(--f-display);font-weight:600;font-size:1.35rem;margin:4px 0 8px;text-wrap:balance}
+.card p{margin:0 0 10px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:12px 0}
+.fact{background:var(--leaf-soft);border-radius:10px;padding:8px 10px}
+.fact .v{font-family:var(--f-mono);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.fact .k{font-size:.75rem;color:var(--muted)}
+.task{border-left:3px solid var(--papaya);background:var(--papaya-soft);padding:10px 12px;border-radius:0 10px 10px 0;margin:10px 0}
+.task b{color:var(--papaya)}
+.q{margin-top:12px}
+.q .qt{font-weight:600}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.opt{text-align:left;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:8px 10px}
+.opt.right{border-color:var(--leaf);background:var(--leaf-soft)}
+.opt.wrong{border-color:var(--papaya);background:var(--papaya-soft)}
+.why{margin-top:8px;font-size:.92rem;color:var(--ink)}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:6px}
+footer{margin-top:14px;font-size:.78rem;color:var(--muted)}
+footer a{color:var(--leaf)}
+.method{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.06em;padding:2px 8px;border-radius:99px;background:var(--ink);color:var(--bg);margin-left:6px;vertical-align:2px}
+[hidden]{display:none!important}
+.load{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.9rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body><header>
+  <h1>Food Protein <span>Structure</span> Lab</h1>
+  <div class="sub">SBS 3073 Bioinformatics · Chapter 6 · X-ray, cryo-EM, NMR and AlphaFold structures of real food proteins</div>
+</header>
+
+<div class="wrap">
+  <section>
+    <div class="stagebox">
+      <div id="viewer" role="img" aria-label="Interactive 3D protein model"></div>
+      <div class="load" id="load">Loading the 3D viewer…</div>
+      <div class="legend" id="legend"></div>
+      <div class="pick" id="pick">Tap or click any part of the protein to name the residue.</div>
+    </div>
+    <div class="tools">
+      <button class="tbtn" id="spin" aria-pressed="false">Spin</button>
+      <button class="tbtn" id="reset">Reset view</button>
+      <button class="tbtn" id="labels" aria-pressed="true">Labels</button>
+    </div>
+  </section>
+
+  <section class="missions">
+    <nav class="mlist" id="mlist" aria-label="Missions"></nav>
+    <article class="card" id="card"></article>
+    <div class="navrow">
+      <button class="tbtn" id="prev">← Previous</button>
+      <button class="tbtn" id="next">Next mission →</button>
+    </div>
+  </section>
+</div>
+
+<footer>
+  Structures download live from RCSB PDB and the AlphaFold Database when you open a mission (the cryo-EM and qNOR files are large; give them a few seconds on mobile data).
+  Entries: 1CMS (chymosin, X-ray 2.3 Å), 9PAP (papain, X-ray 1.65 Å), 5A1A (β-galactosidase, cryo-EM 2.2 Å), 6L1X and 6L3H (qNOR, X-ray 3.15 Å and cryo-EM 3.06 Å), 1BRZ (brazzein, NMR, 43 models), AlphaFold AF-P00784 (papain) and AF-P02662 (αs1-casein). Viewer: 3Dmol.js.
+  <a href="https://www.rcsb.org" target="_blank" rel="noopener">RCSB PDB</a> · <a href="https://alphafold.ebi.ac.uk" target="_blank" rel="noopener">AlphaFold DB</a> · <a href="https://arifjamali-90.github.io/papain-3d-lab/" target="_blank" rel="noopener">Chapter 5: Papain 3D Lab</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
+<script>
+(function(){
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const AA={ALA:'Ala',ARG:'Arg',ASN:'Asn',ASP:'Asp',CYS:'Cys',OCS:'Cys*',GLN:'Gln',GLU:'Glu',GLY:'Gly',HIS:'His',ILE:'Ile',LEU:'Leu',LYS:'Lys',MET:'Met',PHE:'Phe',PRO:'Pro',SER:'Ser',THR:'Thr',TRP:'Trp',TYR:'Tyr',VAL:'Val',SEP:'pSer'};
+const AA3=/^(ALA|ARG|ASN|ASP|CYS|GLN|GLU|GLY|HIS|ILE|LEU|LYS|MET|PHE|PRO|SER|THR|TRP|TYR|VAL|OCS)$/;
+let viewer=null,cur=0,spinning=false,showLabels=true,done=new Set(),loaded='';
+const C={a:'#2E86AB',b:'#E07A2E',c:'#54A24B',d:'#B279A2',grey:'#C9CED4',asp:'#C2185B',helix:'#E4572E',sheet:'#3A8FD6',lh:'#F2B134',other:'#B8BEC6'};
+function plddt(a){return a.b>90?'#0053D6':(a.b>70?'#65CBF3':(a.b>50?'#FFDB13':'#FF7D45'));}
+const PL=[['#0053D6','very high (>90)'],['#65CBF3','confident (70–90)'],['#FFDB13','low (50–70)'],['#FF7D45','very low (<50)']];
+function bcol(a){const t=Math.max(0,Math.min(1,(a.b-5)/30));const lerp=(x,y,f)=>Math.round(x+(y-x)*f);
+ if(t<0.5){const f=t/0.5;return `rgb(${lerp(30,240,f)},${lerp(70,240,f)},${lerp(200,240,f)})`;}const f=(t-0.5)/0.5;return `rgb(${lerp(240,215,f)},${lerp(240,48,f)},${lerp(240,39,f)})`;}
+function lab(v,txt,sel,color){if(!showLabels)return;const a=v.selectedAtoms(sel)[0];if(!a)return;v.addLabel(txt,{position:a,fontSize:13,fontColor:'#ffffff',backgroundColor:color,backgroundOpacity:0.92,borderThickness:0,inFront:true});}
+const legend=items=>document.getElementById('legend').innerHTML=items.map(i=>`<span class="chip"><i style="background:${i[0]}"></i>${i[1]}</span>`).join('');
+
+/* ---------- structure loading (lazy, cached) ---------- */
+const RAW={},S={},PHI={};
+const get=u=>RAW[u]||(RAW[u]=fetch(u).then(r=>{if(!r.ok)throw new Error(u);return r.text();}));
+const RC=id=>`https://files.rcsb.org/download/${id}.pdb`,AF=id=>`https://alphafold.ebi.ac.uk/files/AF-${id}-F1-model_v6.pdb`;
+function filt(txt,o){o=o||{};return txt.split('\n').filter(l=>{const r=l.slice(0,6);if(r==='MODEL '||r==='ENDMDL')return !!o.models;if(r!=='ATOM  '&&r!=='HETATM')return false;if(o.ch&&!o.ch.includes(l[21]))return false;const rn=l.slice(17,20);if(rn==='HOH')return false;if(r==='HETATM'&&!(o.het||[]).includes(rn))return false;if(!o.keepH&&l.slice(76,78).trim()==='H')return false;if(l[16]!==' '&&l[16]!=='A')return false;return true;});}
+function ssl(txt,chs){return txt.split('\n').filter(l=>(l.startsWith('HELIX')&&chs.includes(l[19]))||(l.startsWith('SHEET')&&chs.includes(l[21])));}
+function cas(lines,off){const m={};lines.forEach(l=>{if(l.slice(12,16).trim()==='CA'&&AA3.test(l.slice(17,20)))m[parseInt(l.slice(22,26))-off]=[+l.slice(30,38),+l.slice(38,46),+l.slice(46,54)];});return m;}
+function superpose(ref,mov,off){const A=cas(ref,0),B=cas(mov,off),P=[],Q=[];for(const i in A)if(B[i]){P.push(B[i]);Q.push(A[i]);}
+ const cen=X=>X.reduce((s,p)=>[s[0]+p[0]/X.length,s[1]+p[1]/X.length,s[2]+p[2]/X.length],[0,0,0]);const cp=cen(P),cq=cen(Q);
+ const p=P.map(x=>[x[0]-cp[0],x[1]-cp[1],x[2]-cp[2]]),q=Q.map(x=>[x[0]-cq[0],x[1]-cq[1],x[2]-cq[2]]);const M=[[0,0,0],[0,0,0],[0,0,0]];
+ for(let k=0;k<p.length;k++)for(let i=0;i<3;i++)for(let j=0;j<3;j++)M[i][j]+=p[k][i]*q[k][j];
+ const [a1,a2,a3]=M[0],[b1,b2,b3]=M[1],[c1,c2,c3]=M[2];
+ const N=[[a1+b2+c3,b3-c2,c1-a3,a2-b1],[b3-c2,a1-b2-c3,a2+b1,c1+a3],[c1-a3,a2+b1,-a1+b2-c3,b3+c2],[a2-b1,c1+a3,b3+c2,-a1-b2+c3]];
+ let v=[1,0.1,0.1,0.1];for(let it=0;it<3000;it++){const w=[0,0,0,0];for(let i=0;i<4;i++)for(let j=0;j<4;j++)w[i]+=(N[i][j]+(i===j?1e5:0))*v[j];const n=Math.hypot(...w);v=w.map(x=>x/n);}
+ const [a,b,c,d]=v;const R=[[a*a+b*b-c*c-d*d,2*(b*c-a*d),2*(b*d+a*c)],[2*(b*c+a*d),a*a-b*b+c*c-d*d,2*(c*d-a*b)],[2*(b*d-a*c),2*(c*d+a*b),a*a-b*b-c*c+d*d]];
+ const tf=y=>[0,1,2].map(i=>R[i][0]*y[0]+R[i][1]*y[1]+R[i][2]*y[2]+cq[i]);
+ let s=0;P.forEach((x,k)=>{const t=tf([x[0]-cp[0],x[1]-cp[1],x[2]-cp[2]]);s+=(t[0]-Q[k][0])**2+(t[1]-Q[k][1])**2+(t[2]-Q[k][2])**2;});
+ const out=mov.map(l=>{const y=[+l.slice(30,38)-cp[0],+l.slice(38,46)-cp[1],+l.slice(46,54)-cp[2]];return l.slice(0,30)+tf(y).map(z=>z.toFixed(3).padStart(8)).join('')+l.slice(54);});
+ out.rmsd=Math.sqrt(s/P.length);out.n=P.length;return out;}
+const setChain=(lines,ch)=>lines.map(l=>l.slice(0,21)+ch+l.slice(22));
+function dihedrals(lines){const R={};lines.forEach(l=>{const n=l.slice(12,16).trim();if(!['N','CA','C'].includes(n))return;const i=parseInt(l.slice(22,26));(R[i]=R[i]||{})[n]=[+l.slice(30,38),+l.slice(38,46),+l.slice(46,54)];R[i].rn=l.slice(17,20);});
+ const sub=(a,b)=>a.map((x,i)=>x-b[i]),cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+ const dih=(p0,p1,p2,p3)=>{const b0=sub(p0,p1),b1=sub(p2,p1),b2=sub(p3,p2);const L=Math.hypot(...b1);const u=b1.map(x=>x/L);const v=sub(b0,u.map(x=>x*dot(b0,u))),w=sub(b2,u.map(x=>x*dot(b2,u)));return Math.atan2(dot(cr(u,v),w),dot(v,w))*180/Math.PI;};
+ const out={};for(const k in R){const i=+k,r=R[i],p=R[i-1],n=R[i+1];if(!p||!n||!p.C||!n.N||!r.N||!r.CA||!r.C)continue;out[i]={phi:dih(p.C,r.N,r.CA,r.C),psi:dih(r.N,r.CA,r.C,n.N),rn:r.rn};}return out;}
+function region(d){if(!d)return 'end';const {phi,psi}=d;if(phi<-30&&phi>-110&&psi<10&&psi>-80)return 'helix';if(phi<-45&&(psi>90||psi<-160))return 'sheet';if(phi>0)return 'left';return 'other';}
+const LOAD={
+ chym:async()=>{const t=await get(RC('1CMS'));return ssl(t,['A']).concat(filt(t,{ch:['A']})).join('\n')+'\nEND';},
+ pap:async()=>{const t=await get(RC('9PAP'));const ref=filt(t,{ch:['A'],het:['OCS']});PHI.pap=dihedrals(ref);return ssl(t,['A']).concat(ref).join('\n')+'\nEND';},
+ bgal:async()=>{const t=await get(RC('5A1A'));return ssl(t,['A','B','C','D']).concat(filt(t,{het:['PTQ']})).join('\n')+'\nEND';},
+ qmono:async()=>{const t=await get(RC('6L1X'));return ssl(t,['A']).concat(filt(t,{ch:['A'],het:['HEM']})).join('\n')+'\nEND';},
+ qdim:async()=>{const t=await get(RC('6L3H'));return ssl(t,['A','B']).concat(filt(t,{het:['HEM']})).join('\n')+'\nEND';},
+ brz:async()=>{const t=await get(RC('1BRZ'));return filt(t,{models:true,keepH:false}).join('\n')+'\nEND';},
+ afpap:async()=>{const t=await get(AF('P00784'));return filt(t).join('\n')+'\nEND';},
+ overlay:async()=>{const [t9,ta]=await Promise.all([get(RC('9PAP')),get(AF('P00784'))]);const ref=filt(t9,{ch:['A'],het:['OCS']});const mov=superpose(ref,filt(ta).filter(l=>parseInt(l.slice(22,26))>=134),133);S.ovr=mov.rmsd;S.ovn=mov.n;return ref.concat(setChain(mov,'X')).join('\n')+'\nEND';},
+ cas:async()=>{const t=await get(AF('P02662'));return filt(t).join('\n')+'\nEND';}
+};
+async function need(k){if(!S[k])S[k]=await LOAD[k]();return S[k];}
+
+/* ---------- missions ---------- */
+const M=[
+ {id:'chymosin',name:'Chymosin: an X-ray structure',method:'X-ray',model:'chym',
+  draw:v=>{v.setStyle({},{cartoon:{color:'spectrum'}});v.addStyle({resi:[34,216]},{stick:{colorscheme:'magentaCarbon',radius:0.35}});lab(v,'Asp34',{resi:34,atom:'CG'},C.asp);lab(v,'Asp216',{resi:216,atom:'CG'},C.asp);},
+  legend:[['linear-gradient(90deg,#3a3fd6,#2fc46b,#f2d02b,#e4572e)','N → C terminus'],[C.asp,'catalytic Asp pair']],
+  text:'Calf chymosin (rennet) is the enzyme that starts cheese making. This model comes from X-ray diffraction of a protein crystal (PDB 1CMS, 2.3 Å, 1990). The chain folds into two lobes with a deep cleft. Two aspartates, one from each lobe, sit together at the bottom of the cleft and cut κ-casein.',
+  facts:[['2.3 Å','resolution'],['0.165','R-value'],['323','residues seen'],['2','catalytic Asp']],
+  task:'Rotate until you look straight into the cleft between the two lobes. Find the two magenta aspartates.',
+  q:'Each lobe brings one Asp to the active site. What does the cleft hold during cheese making?',o:['A sugar molecule','A stretch of the κ-casein chain','A metal ion'],a:1,
+  why:'The flexible part of κ-casein lies in the cleft and is cut at Phe105–Met106. Casein micelles then lose their “hairs” and milk curdles.'},
+ {id:'bfactor',name:'Resolution & B-factors',method:'X-ray',model:'pap',
+  draw:v=>{v.setStyle({},{cartoon:{colorfunc:bcol,thickness:0.5}});v.addStyle({resn:'OCS'},{cartoon:{colorfunc:bcol}});},
+  legend:[['rgb(30,70,200)','low B (rigid, well defined)'],['rgb(240,240,240)','medium'],['rgb(215,48,39)','high B (mobile)']],
+  text:'Every atom in a crystal structure carries a B-factor (Å²): how smeared out it was in the electron density. Low B means rigid and well defined; high B means mobile or uncertain. Papain (PDB 9PAP) was solved at 1.65 Å, so most of it is sharp.',
+  facts:[['1.65 Å','resolution'],['12 Å²','mean Cα B'],['1–57 Å²','Cα B range']],
+  task:'Find the red patches. Are they in helices in the core, or in loops at the surface? Click one to read its B-factor.',
+  q:'Where do the highest B-factors usually appear?',o:['In the buried core of the protein','In exposed surface loops and chain ends','On the catalytic residues only'],a:1,
+  why:'Surface loops and termini move more in the crystal, so their density is weaker. When you plan a mutation in a red loop, remember its position is less certain.'},
+ {id:'bgal',name:'Lactase by cryo-EM',method:'Cryo-EM',model:'bgal',
+  draw:v=>{const cc={A:C.a,B:C.b,C:C.c,D:C.d};for(const c in cc)v.setStyle({chain:c},{cartoon:{color:cc[c]}});v.addStyle({resn:'PTQ'},{sphere:{color:'#C2185B',radius:1.6}});lab(v,'inhibitor (PETG)',{resn:'PTQ',chain:'A'},'#C2185B');},
+  legend:[[C.a,'chain A'],[C.b,'chain B'],[C.c,'chain C'],[C.d,'chain D'],['#C2185B','PETG in each active site']],
+  text:'β-Galactosidase is the lactase that makes lactose-free milk. No crystal needed: the purified enzyme was frozen in thin ice and imaged in an electron microscope. Averaging images of many thousands of individual particles gave this 2.2 Å map (PDB 5A1A, EMD-2984), a landmark for cryo-EM in 2015.',
+  facts:[['2.2 Å','resolution'],['467 kDa','tetramer'],['1,539','micrographs'],['12.4 TB','raw data (EMPIAR-10061)']],
+  task:'Count the four chains. Then find the four pink inhibitor molecules: one in each active site.',
+  q:'Why was cryo-EM a good choice for this enzyme?',o:['It is too small for X-ray','It is a large complex, and EM works best on big particles','It only exists in solution as a crystal'],a:1,
+  why:'Large particles give strong images. At 467 kDa, β-galactosidase is an ideal cryo-EM sample; very small proteins (below ~50 kDa) are still hard.'},
+ {id:'qnor-x',name:'qNOR by X-ray: a monomer',method:'X-ray',model:'qmono',
+  draw:v=>{v.setStyle({},{cartoon:{color:C.a}});v.addStyle({resn:'HEM'},{stick:{colorscheme:'redCarbon',radius:0.3}});lab(v,'heme',{resn:'HEM'},'#B71C1C');},
+  legend:[[C.a,'qNOR chain A'],['#C62828','heme groups']],
+  text:'Quinol-dependent nitric oxide reductase (qNOR) from Neisseria meningitidis is a membrane enzyme that turns toxic NO into N₂O. Your lecturer’s team crystallised it and solved this structure by X-ray (PDB 6L1X, 3.15 Å, IUCrJ 2020). In the crystal it appears as a single chain.',
+  facts:[['3.15 Å','resolution'],['0.303','R-free'],['751','residues'],['1','chain']],
+  task:'Find the heme groups buried inside the membrane helices. This is where NO is reduced.',
+  q:'The crystal shows a monomer. Can we be sure the enzyme is a monomer in the cell?',o:['Yes, crystals never change a protein','Not yet: crystal packing and detergents can break apart or create contacts','Yes, because the resolution is high'],a:1,
+  why:'Crystallisation conditions can disturb how chains pair. That question was answered by the next mission.'},
+ {id:'qnor-em',name:'qNOR by cryo-EM: a dimer',method:'Cryo-EM',model:'qdim',
+  draw:v=>{v.setStyle({chain:'A'},{cartoon:{color:C.a}});v.setStyle({chain:'B'},{cartoon:{color:C.b}});v.addStyle({resn:'HEM'},{stick:{colorscheme:'redCarbon',radius:0.3}});lab(v,'chain A',{chain:'A',resi:300,atom:'CA'},C.a);lab(v,'chain B',{chain:'B',resi:300,atom:'CA'},C.b);},
+  legend:[[C.a,'chain A'],[C.b,'chain B'],['#C62828','hemes']],
+  text:'The same enzyme, now imaged by single-particle cryo-EM without a crystal (PDB 6L3H, 3.06 Å). Two copies pair up into a dimer. Together with activity measurements, the team concluded that the active form of qNOR is the dimer.',
+  facts:[['3.06 Å','resolution'],['2','chains'],['1,502','residues'],['C2','symmetry']],
+  task:'Rotate the model. Where do the two chains touch? Compare with the single chain in the previous mission.',
+  q:'What is the main lesson from comparing 6L1X and 6L3H?',o:['Cryo-EM is always more accurate than X-ray','The method and sample conditions can change what we see, so check with more than one method','Dimers are always inactive'],a:1,
+  why:'Each method has its own artefacts. Combining X-ray, cryo-EM and biochemistry gives the most reliable picture of a protein’s working form.'},
+ {id:'nmr',name:'Brazzein by NMR',method:'NMR',model:'brz',
+  draw:v=>{v.setStyle({},{cartoon:{color:'spectrum',style:'trace',thickness:0.25}});},
+  legend:[['linear-gradient(90deg,#3a3fd6,#2fc46b,#f2d02b,#e4572e)','N → C terminus, 43 models']],
+  text:'Brazzein is a small sweet protein from the West African fruit Pentadiplandra brazzeana, a candidate natural sweetener that survives heating. NMR measures the protein in solution and gives not one model but an ensemble that fits the data (PDB 1BRZ: 80 calculated, 43 deposited).',
+  facts:[['54','residues'],['6.5 kDa','mass'],['43','models'],['4','S–S bonds']],
+  task:'Look at where the 43 models agree (tight bundle) and where they spread out. Which parts of the chain are spread?',
+  q:'Why do the chain ends fan out?',o:['The NMR machine was broken','The ends are flexible in solution and few NMR restraints define them','Each model is a different protein'],a:1,
+  why:'Spread in an NMR ensemble shows flexibility or missing data. The core, held by four disulfide bonds, is well defined.'},
+ {id:'afpap',name:'AlphaFold confidence',method:'AlphaFold',model:'afpap',
+  draw:v=>{v.setStyle({},{cartoon:{colorfunc:plddt,thickness:0.5}});lab(v,'signal + propeptide start',{resi:10,atom:'CA'},'#C25B1E');lab(v,'mature papain',{resi:250,atom:'CA'},'#0053D6');},
+  legend:PL,
+  text:'AlphaFold predicted the full papain precursor from sequence alone (AF-P00784). Colour shows pLDDT, the model’s own confidence for each residue. The mature enzyme is dark blue (very high); the signal peptide is orange.',
+  facts:[['90.3','mean pLDDT'],['83.8%','very high'],['7.2%','very low']],
+  task:'Click residues in the orange tail and in the blue core. Note the pLDDT value shown in the box.',
+  q:'The signal peptide is cut off in the cell and has no fixed shape. What should you do with its orange coordinates?',o:['Treat them as accurate','Ignore them: low pLDDT means do not trust the position','Use them to design a drug'],a:1,
+  why:'pLDDT below 50 usually means disorder or no reliable prediction. Read the colour before you read the shape.'},
+ {id:'overlay',name:'Prediction vs experiment',method:'AlphaFold vs X-ray',model:'overlay',
+  draw:v=>{v.setStyle({chain:'A'},{cartoon:{color:'#9AA3AD',thickness:0.5}});v.addStyle({chain:'A',resn:'OCS'},{cartoon:{color:'#9AA3AD'}});v.setStyle({chain:'X'},{cartoon:{color:'#E07A2E',thickness:0.3,opacity:0.95}});},
+  legend:[['#9AA3AD','X-ray 9PAP'],['#E07A2E','AlphaFold model, superposed']],
+  text:'Here the AlphaFold model of mature papain is laid on top of the X-ray structure. The fit is measured as RMSD over matching Cα atoms.',
+  facts:[['—','Cα RMSD'],['—','Cα atoms compared']],
+  task:'Rotate and look for any place where orange and grey separate. Are there any?',
+  q:'Papain’s X-ray structure was public decades before AlphaFold was trained. What does that mean for this comparison?',o:['It proves AlphaFold works on every protein','It is not a blind test: the model may have learned from this very structure','The X-ray structure must be wrong'],a:1,
+  why:'Fair tests (like CASP) use structures nobody has seen. Excellent agreement here is expected; the real value of AlphaFold is for proteins with no structure yet.'},
+ {id:'casein',name:'αs1-casein: when AlphaFold says “unsure”',method:'AlphaFold',model:'cas',
+  draw:v=>{v.setStyle({},{cartoon:{colorfunc:plddt,thickness:0.7}});},
+  legend:PL,
+  text:'αs1-casein is the most abundant protein in cow’s milk. There is no experimental structure in the PDB. AlphaFold’s model (AF-P02662) is mostly orange: 70.6% of residues are very low confidence. This is not a failure: caseins are intrinsically disordered, which lets them bind calcium phosphate and assemble into micelles.',
+  facts:[['50.2','mean pLDDT'],['0%','very high'],['70.6%','very low'],['0','PDB entries']],
+  task:'Spin the model. Find the few helices (light blue/yellow). Everything else is a confident “I don’t know”.',
+  q:'A student says “AlphaFold shows αs1-casein is a loose ring”. Is that right?',o:['Yes, the picture shows it','No: low pLDDT means the shape is not meaningful; the protein is disordered','Yes, if you rotate it'],a:1,
+  why:'Disordered proteins have no single shape. The drawing is a placeholder; the confidence colours are the real result.'},
+ {id:'rama',name:'Check the backbone',method:'Validation',model:'pap',
+  draw:v=>{v.setStyle({},{cartoon:{colorfunc:a=>({helix:C.helix,sheet:C.sheet,left:C.lh,other:C.other,end:C.other})[region(PHI.pap[a.resi])],thickness:0.5}});v.addStyle({resn:'OCS'},{cartoon:{color:C.other}});},
+  legend:[[C.helix,'α-helix region'],[C.sheet,'β region'],[C.lh,'left-handed (φ > 0)'],[C.other,'other / loops']],
+  text:'Each residue has two backbone angles, φ (phi) and ψ (psi). Only some combinations are allowed: this is the Ramachandran plot, the first thing structure validation checks. Here papain is coloured by where each residue falls on the plot. Click any residue to see its φ and ψ.',
+  facts:[['207','residues with φ/ψ'],['3','non-Gly with φ > 0']],
+  task:'Click several gold residues. What amino acid are most of them?',
+  q:'Why is glycine often found in the left-handed (φ > 0) region?',o:['Glycine is the largest amino acid','Glycine has no side chain, so it can bend in ways others cannot','Glycine is always in helices'],a:1,
+  why:'Without a side chain, glycine avoids the clashes that forbid φ > 0 for most residues. A non-Gly residue in a forbidden region is a warning sign in validation reports.'}
+];
+
+function init(){
+  viewer=$3Dmol.createViewer(document.getElementById('viewer'),{backgroundColor:css('--stage'),antialias:true});
+  viewer.setClickable({},true,pick);
+  document.getElementById('mlist').innerHTML=M.map((m,i)=>`<button class="mbtn" id="m-${m.id}" data-i="${i}"><span class="n">${i+1}</span>${m.name}</button>`).join('');
+  document.querySelectorAll('.mbtn').forEach(b=>b.addEventListener('click',()=>go(+b.dataset.i)));
+  document.getElementById('prev').onclick=()=>go((cur+M.length-1)%M.length);
+  document.getElementById('next').onclick=()=>go((cur+1)%M.length);
+  document.getElementById('reset').onclick=()=>{viewer.zoomTo();viewer.render();};
+  document.getElementById('spin').onclick=e=>{spinning=!spinning;e.currentTarget.setAttribute('aria-pressed',spinning);viewer.spin(spinning?'y':false);};
+  document.getElementById('labels').onclick=e=>{showLabels=!showLabels;e.currentTarget.setAttribute('aria-pressed',showLabels);go(cur,true);};
+  const mq=window.matchMedia('(prefers-color-scheme: dark)');const retheme=()=>{viewer.setBackgroundColor(css('--stage'));viewer.render();};
+  mq.addEventListener&&mq.addEventListener('change',retheme);new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  let start=0;const h=(location.hash||'').slice(1);const k=M.findIndex(m=>m.id===h);if(k>=0)start=k;
+  go(start);
+}
+let ticket=0;
+async function go(i,keepView){
+  cur=i;const m=M[i];const my=++ticket;
+  document.querySelectorAll('.mbtn').forEach((b,j)=>b.setAttribute('aria-current',j===i));
+  renderCard(i);legend(m.legend);
+  const ld=document.getElementById('load');
+  if(loaded!==m.model){ld.hidden=false;ld.textContent='Downloading the structure…';
+    try{await need(m.model);}catch(e){ld.textContent='Could not download this structure. Check the internet connection and try again.';return;}
+    if(my!==ticket)return;
+    viewer.removeAllModels();
+    if(m.model==='brz')viewer.addModels(S.brz,'pdb');else viewer.addModel(S[m.model],'pdb');
+    loaded=m.model;keepView=false;ld.hidden=true;
+    if(m.model==='overlay')renderCard(i);
+  }
+  viewer.removeAllLabels();viewer.removeAllShapes();viewer.removeAllSurfaces();
+  m.draw(viewer);
+  if(!keepView)viewer.zoomTo();
+  viewer.render();
+  document.getElementById('pick').innerHTML='Tap or click any part of the protein to name the residue.';
+}
+function renderCard(i){
+  const m=M[i];let facts=m.facts;
+  if(m.id==='overlay'&&S.ovr)facts=[[S.ovr.toFixed(2)+' Å','Cα RMSD'],[String(S.ovn),'Cα atoms compared'],['97.6','mean pLDDT, mature part']];
+  const c=document.getElementById('card');
+  c.innerHTML=`<div class="eyebrow">Mission ${i+1} of ${M.length}<span class="method">${m.method}</span></div><h2>${m.name}</h2><p>${m.text}</p>
+   <div class="facts">${facts.map(f=>`<div class="fact"><div class="v">${f[0]}</div><div class="k">${f[1]}</div></div>`).join('')}</div>
+   <div class="task"><b>Try it.</b> ${m.task}</div>
+   <div class="q"><div class="qt">${m.q}</div><div class="opts">${m.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join('')}</div><div class="why" id="why" hidden></div></div>`;
+  c.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{const j=+b.dataset.j;c.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));b.classList.add(j===m.a?'right':'wrong');if(j===m.a){done.add(i);document.querySelectorAll('.mbtn')[i].classList.add('done');}const w=document.getElementById('why');w.hidden=false;w.textContent=(j===m.a?'Correct. ':'Not quite. ')+m.why;}));
+}
+function pick(atom){
+  const m=M[cur];const rn=AA[atom.resn]||atom.resn;
+  if(atom.hetflag&&!AA[atom.resn]){document.getElementById('pick').innerHTML=`<b>${atom.resn}</b> (ligand)`+(atom.resn==='HEM'?' — heme':atom.resn==='PTQ'?' — PETG inhibitor':'');return;}
+  let extra='';
+  if(m.model==='afpap'||m.model==='cas')extra=`pLDDT <b>${atom.b.toFixed(0)}</b>`;
+  else if(m.model==='overlay')extra=atom.chain==='X'?'AlphaFold model':'X-ray 9PAP';
+  else if(m.model==='brz')extra='NMR model '+((atom.model||0)+1)+' of 43';
+  else extra=`B-factor <b>${atom.b.toFixed(0)}</b> Å²`;
+  if(m.id==='rama'){const d=PHI.pap[atom.resi];extra=d?`φ <b>${d.phi.toFixed(0)}°</b>, ψ <b>${d.psi.toFixed(0)}°</b> · ${({helix:'α-helix region',sheet:'β region',left:'left-handed region',other:'other region'})[region(d)]}`:'chain end (no φ/ψ)';}
+  const ch=(m.model==='bgal'||m.model==='qdim')?` · chain ${atom.chain}`:'';
+  let num=`${rn}${atom.resi}`;
+  if(m.model==='overlay'&&atom.chain==='X')num+=` (mature ${rn}${atom.resi-133})`;
+  document.getElementById('pick').innerHTML=`<b>${num}</b>${ch}<br><span style="color:var(--muted)">${extra}</span>`;
+}
+function boot(){const ld=document.getElementById('load');if(!window.$3Dmol){ld.textContent='The 3D viewer could not load. Check the internet connection and reload.';return;}init();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</body></html>
