@@ -161,7 +161,7 @@ async function need(k){if(!S[k])S[k]=await LOAD[k]();return S[k];}
 
 /* ---------- missions ---------- */
 const M=[
- {id:'chymosin',name:'Chymosin: an X-ray structure',method:'X-ray',model:'chym',
+ {id:'chymosin',name:'Chymosin: an X-ray structure',method:'X-ray',model:'chym',view:v=>{v.rotate(270,'y');},
   draw:v=>{v.setStyle({},{cartoon:{color:'spectrum'}});v.addStyle({resi:[34,216]},{stick:{colorscheme:'magentaCarbon',radius:0.35}});lab(v,'Asp34',{resi:34,atom:'CG'},C.asp);lab(v,'Asp216',{resi:216,atom:'CG'},C.asp);},
   legend:[['linear-gradient(90deg,#3a3fd6,#2fc46b,#f2d02b,#e4572e)','N → C terminus'],[C.asp,'catalytic Asp pair']],
   text:'Calf chymosin (rennet) is the enzyme that starts cheese making. This model comes from X-ray diffraction of a protein crystal (PDB 1CMS, 2.3 Å, 1990). The chain folds into two lobes with a deep cleft. Two aspartates, one from each lobe, sit together at the bottom of the cleft and cut κ-casein.',
@@ -269,12 +269,13 @@ async function go(i,keepView){
     if(my!==ticket)return;
     viewer.removeAllModels();
     if(m.model==='brz')viewer.addModels(S.brz,'pdb');else viewer.addModel(S[m.model],'pdb');
+    viewer.setClickable({},true,pick);
     loaded=m.model;keepView=false;ld.hidden=true;
     if(m.model==='overlay')renderCard(i);
   }
   viewer.removeAllLabels();viewer.removeAllShapes();viewer.removeAllSurfaces();
   m.draw(viewer);
-  if(!keepView)viewer.zoomTo();
+  if(!keepView){viewer.zoomTo();if(m.view)m.view(viewer);}
   viewer.render();
   document.getElementById('pick').innerHTML='Tap or click any part of the protein to name the residue.';
 }
